@@ -7,6 +7,7 @@
                         'city': '@city(true)'   //中国城市
                     }]
     }
+  
     const def_url = 'http://api.com';
 
     var view = document.querySelector('.user_mock');

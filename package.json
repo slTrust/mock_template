@@ -1,5 +1,7 @@
 {
   "devDependencies": {
+    "express": "4.15.3",
+    "mockjs": "^1.0.1-beta3",
     "mysql": "^2.15.0"
   }
 }
