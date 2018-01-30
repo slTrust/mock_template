@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style lang="">
+        *{margin:0;padding:0;}
+        .clearfix::after{content:''; display: block; clear:both;}
+        #container{ width:100%;}
+        #container .def_mock, #container .user_mock{width:50%; border:1px solid red; box-sizing: border-box;float:left;}
+    </style>
+</head>
+<body>
+    <header>
+
+    </header>
+    <section id="container" class="container">
+        <div class="clearfix">
+            <div id="def_mock" class="def_mock">
+                <p>
+                    <span>默认生成的mock数据</span>
+                    <span>url:  </span>
+                    <button class="btn">刷新</button>
+                </p>
+                <textarea name="rule"  cols="30" rows="10" style="width:35%;height:400px;"></textarea>
+                <textarea name="content" cols="30" rows="10" style="width:60%;height:400px;"></textarea>
+            </div>
+            <div class="user_mock">
+                <button class="refresh">刷新</button>
+                <form action="" id="form">
+                    <p style="padding:10px;">
+                        <label for="">接口url:</label>
+                        <input type="text" name="url" style="width:600px;line-height:30px;font-size:14px;"> <br>
+                    </p>
+                    <textarea name="rule"  cols="30" rows="10" style="width:35%;height:400px;"></textarea>
+                    <textarea name="content" cols="30" rows="10" style="width:60%;height:400px;"></textarea>
+                </form> 
+            </div>
+        </div>
+
+           
+    </section>
+    <footer></footer>
+    <script src="./js/jquery-3.1.1.js"></script>
+    <script src="./js/mock.js"></script>
+    <script src="./js/def_mock.js"></script>
+    <script src="./js/user_mock.js"></script>
+</body>
+</html>
