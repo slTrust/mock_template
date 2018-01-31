@@ -10,6 +10,7 @@
         .clearfix::after{content:''; display: block; clear:both;}
         #container{ width:100%;}
         #container .def_mock, #container .user_mock{width:50%; border:1px solid red; box-sizing: border-box;float:left;}
+        input,select{line-height: 30px;outline: none;width:300px;font-size:14px;color:#333;margin:10px;}
     </style>
 </head>
 <body>
@@ -28,24 +29,129 @@
                 <textarea name="content" cols="30" rows="10" style="width:60%;height:400px;"></textarea>
             </div>
             <div class="user_mock">
-                <button class="refresh">刷新</button>
-                <form action="" id="form">
-                    <p style="padding:10px;">
-                        <label for="">接口url:</label>
-                        <input type="text" name="url" style="width:600px;line-height:30px;font-size:14px;"> <br>
-                    </p>
-                    <textarea name="rule"  cols="30" rows="10" style="width:35%;height:400px;"></textarea>
-                    <textarea name="content" cols="30" rows="10" style="width:60%;height:400px;"></textarea>
-                </form> 
+                <select name="" id="url_list" style="height:30px;"></select> <button id="search">查询</button><br>
+                <textarea name="" id="data_list" cols="30" rows="10" style="width:60%;height:300px;"></textarea>
             </div>
         </div>
 
-           
+        <div id="add_model">
+            <h2>新增接口和规则</h2>
+            <div id="" style="border:10px solid  #ccc;">
+                <label for="">mock_url</label>
+                <input type="text" name="mock_url"><br>
+                <label for="">mock规则</label>
+                <textarea name="mock_rule" id="" cols="30" rows="10"  style="width:30%;height:300px;"></textarea><br>
+                <button id="btn_add">保存</button>
+            </div>
+        </div>
     </section>
     <footer></footer>
-    <script src="./js/jquery-3.1.1.js"></script>
-    <script src="./js/mock.js"></script>
-    <script src="./js/def_mock.js"></script>
-    <script src="./js/user_mock.js"></script>
+    <script src="js/jquery-3.1.1.js"></script>
+    <script src="js/mock.js"></script>
+    <script src="js/def_mock.js"></script>
+    <script>
+        !function(){
+            var $search = $('.user_mock #search');
+            
+            var baseUrlJsonArr = null;
+            selectUrlList();
+            $search.on('click',function(){
+                var url = $('#url_list').val();
+                $.ajax({
+                    url:url,//查询所有的规则
+                    dataType:'json',
+                    success:function(res){
+                       $('#data_list').val(JSON.stringify(res,null,4));
+                    }
+                })
+            })
+            window.updateSelect = selectUrlList;
+            //查询数据库里的 接口
+            function selectUrlList(){
+                $.ajax({
+                    cache:false,
+                    url:'/getData',//查询所有的规则
+                    dataType:'json',
+                    success:function(res){
+                        console.log(res);
+                        baseUrlJsonArr = res;
+                        initSelect(baseUrlJsonArr);
+                    }
+                })
+            }
+
+            function initSelect(jsonArr){
+                if(jsonArr.length!==0){
+                    $('#url_list').html('');
+                    var str = '';
+                    for(var i=0;i<jsonArr.length;i++){
+                        str += '<option>'+jsonArr[i]['mock_url']+'</option>'
+                    }
+                    $('#url_list').html(str);
+                }else{
+                    $('#url_list').html('');
+                }
+               
+            }
+        }.call()
+    </script>
+    <script>
+        !function(){
+            var view = document.querySelector('#add_model');
+
+            var controller = {
+                view :null,
+                btn_add:null,
+                mock_url:null,
+                mock_mock:null,
+                init:function(view){
+                    this.view = view;
+                    this.btn_add = view.querySelector('#btn_add')
+                    this.mock_url = view.querySelector('input[name=mock_url]');
+                    this.mock_mock = view.querySelector('[name=mock_rule]');
+                    this.bindEvents();
+                },
+                bindEvents:function(){
+                    this.btn_add.addEventListener('click',()=>{
+                        var url = this.mock_url.value;
+                        var rule = this.mock_mock.value;
+                        var url2 = url.replace(/\n|\t|\s/g,'')
+                        var rule2 = rule.replace(/\n|\t|\s/g,'')
+                        if(url2.length === 0 || rule2.length === 0){
+                            alert('url或者规则为空')
+                            return;
+                        }
+                        var flg = true;
+                        try {
+                            var a = JSON.parse(rule2);
+                        } catch (error) {
+                            alert('规则格式错误，请重新输入')    
+                            flg = false;                        
+                        }
+                        if(!flg) return;
+                        $.ajax({
+                            url:'/mock_admin/add',
+                            type:'post',
+                            dataType:'json',
+                            data:{
+                                mock_url:url,
+                                mock_rule:rule
+                            },
+                            success:function(res){
+                                console.log(res);
+                                if(res.res === 0){
+                                    alert(res.msg);
+                                    window.updateSelect();
+                                }else{
+                                    alert(res.msg);
+                                }
+                            }
+                        })
+                    })
+                }
+            };
+            controller.init(view);
+        }.call()
+    </script>
 </body>
 </html>

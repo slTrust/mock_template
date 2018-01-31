@@ -19,7 +19,7 @@
         ruleJson:null,
         init:function(view){
             this.view = view;
-            this.rule = view.querySelector('[name=rule]');
+            this.rule = view.querySelector('[name=mock_rule]');
             this.def_dataList = view.querySelector('[name=content]');
             this.reload_btn = view.querySelector('.refresh');
             this.ruleJson = def_ruleJson;
