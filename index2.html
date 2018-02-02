@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style lang="">
+        
+    </style>
+</head>
+<body>
+    <header>
+
+    </header>
+    <section id="container" class="container">
+        <div id="update_url">
+            <h2>编辑指定的接口规则和接口数据</h2>
+            <button id="btn_refresh" class="btn btn-info">刷新接口</button>
+            <a class="btn btn-link" href="http://mockjs.com/examples.html" target="_blank">mock规则</a>
+            <hr>
+            <form id="update_form" class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-1 control-label" style="text-align:left;">选择接口</label> 
+                    <div class="col-sm-11">
+                        <select id="select_url" class="form-control">
+                        </select>
+                    </div>
+                   
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        <p style="line-height:32px;">
+                            <label for="mock_data">接口规则</label> 
+                            <span class="btn btn-default btn-sm" id="btn_createRuleData">根据规则生成数据</span>
+                        </p>
+                        <textarea class="form-control" name="mock_rule" rows="10"></textarea>
+                    </div>
+                    <div class="col-sm-8">
+                        <p style="line-height:32px;">
+                            <label for="mock_data">接口数据</label> 
+                        </p>
+                        <textarea class="form-control" name="mock_data" rows="10"></textarea>
+                    </div>
+                </div>
+                <button type="submit" id="btn_add" class="btn btn-primary">保存更改</button>
+            </form>
+        </div>
+        <hr>
+        <div id="add_url">
+            <h2>新增接口</h2>
+            <form id="add_form" class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" id="mock_url" style="" name="mock_url" placeholder="接口url">
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="mock_name" name="mock_name" placeholder="接口名">
+                    </div>
+                    <div class="col-sm-3">
+                        <button type="submit" id="btn_add" class="btn btn-default">提交</button>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+        
+    </section>
+    <footer></footer>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="js/mock.js"></script>
+    <script>
+        window.model = {
+            mock_id:'_id',
+            mock_url:'mock_url',
+            mock_name:'mock_name',
+            mock_rule:'mock_rule',
+            mock_data:'mock_data'
+        }
+    </script>
+    <script>
+        //新增接口  和接口名
+        !function(){
+            var view = document.querySelector('#add_url');
+
+            var controller = {
+                view:null,
+                mock_url:null,
+                mock_name:null,
+                form:null,
+                btn_add:null,
+                init:function(view){
+                    this.view = view;
+                    this.mock_url = view.querySelector('input[name=mock_url]');
+                    this.mock_name = view.querySelector('input[name=mock_name]');
+                    this.btn_add = view.querySelector('#btn_add');
+                    this.form = view.querySelector('form#add_form');
+                    this.bindEvents();
+                },
+                bindEvents:function(){
+                    this.form.addEventListener('submit',(e)=>{
+                        e.preventDefault();
+                        var url = this.mock_url.value;
+                        var name = this.mock_name.value;
+                        var url2 = url.replace(/\n|\t|\s/g,'');
+                        var name2 = name.replace(/\n|\t|\s/g,'')
+
+                        if(url2.length === 0 || name2.length === 0){
+                            alert('url或者接口名为空')
+                            return;
+                        }
+
+                        $.ajax({
+                            url:'/mock_admin/add',
+                            type:'post',
+                            dataType:'json',
+                            data:{
+                                mock_url:url2,
+                                mock_name:name2
+                            },
+                            success:(res)=>{
+                                if(res.res === 0){
+                                    alert(res.msg);
+                                    this.mock_name.value = '';
+                                    this.mock_url.value = '';
+                                    window.location.reload(true);
+                                }else{
+                                    alert(res.msg);
+                                }
+                            }
+                        })
+                    })
+                }
+            }
+            controller.init(view);
+        }.call()
+    </script>
+    <script>
+        //更新接口 规则和数据  
+        !function(){
+            var view = document.querySelector('#update_url');
+
+            var controller = {
+                view:null,
+                select:null,
+                btn_reload:null, 
+                mock_rule:null,
+                mock_data:null,
+                form:null,
+                btn_refresh:null,
+                btn_createRuleData:null,
+                mock_res:null,
+                init:function(view){
+                    this.view = view;
+                    this.mock_rule = view.querySelector('[name=mock_rule]');
+                    this.mock_data = view.querySelector('[name=mock_data]');
+                    this.btn_refresh = view.querySelector('#btn_refresh');
+                    this.form = view.querySelector('form#update_form');
+                    this.select = view.querySelector('#select_url');
+                    this.btn_createRuleData = view.querySelector('#btn_createRuleData');
+                    //初始化下拉选的数据
+                    this.initSelect();
+                    window.initSelect = this.initSelect();
+                    this.bindEvents();
+                },
+                initSelect:function(){
+                    this.select.innerHTML = '';
+                    this.refreshUrlData((res)=>{
+                        this.mock_res = res;
+                        var str ='';
+                        for(var i=0;i<this.mock_res.length;i++){
+                            str += '<option value="'+this.mock_res[i][model.mock_id]+'">'+this.mock_res[i][model.mock_name]+' ==> '+this.mock_res[i][model.mock_url]+'</option>';
+                        }
+                        this.select.innerHTML = '<option value="-1">未选择</option>'+str;
+                    },()=>{
+                        alert('初始化下拉选失败')
+                    })
+                },
+                resetForm:function(idx){
+                    if(idx>=0){
+                        this.mock_rule.value = this.mock_res[idx][model.mock_rule]||'';
+                        this.mock_data.value = this.mock_res[idx][model.mock_data]||'';
+                    }else{
+                        this.mock_rule.value = '';
+                        this.mock_data.value = '';
+                    }
+                  
+                },
+                selectChange:function(){
+                    this.select.addEventListener('change',()=>{
+                        var selectUrlId = this.select.value;
+                        if(this.mock_res&&this.mock_res.length!==0){
+                            var idx = -1;
+                            for(var i=0;i<this.mock_res.length;i++){
+                                var currentId =this.mock_res[i][model.mock_id] +'';
+                                if(selectUrlId === currentId){
+                                    idx = i;
+                                }
+                            }
+                            //根据索引跟新表单
+                            this.resetForm(idx);
+                        }
+                    })
+                    
+                },
+                refreshUrlData:function(fnSucc,fnErr){
+                    return $.ajax({
+                                cache:false,
+                                url:'/getData',//查询所有的规则
+                                dataType:'json'
+                            }).then(fnSucc,fnErr);
+                },
+                bindEvents:function(){
+                    //监听点击刷新按钮
+                    this.btn_refresh.addEventListener('click',()=>{
+                        this.initSelect();
+                        this.resetForm();
+                    })
+                    //下拉选改变
+                    this.selectChange();
+                    //监听提交的规则和数据
+                    this.form.addEventListener('submit',(e)=>{
+                        e.preventDefault();
+                       
+                        //获取id
+                        var id = this.select.value;
+
+                        if(id==='-1'){
+                            alert('请选择接口')
+                            return;
+                        }
+
+                        var rule = this.mock_rule.value;
+                        var data = this.mock_data.value;
+                        var rule2 = rule.replace(/\n|\t|\s/g,'');  //去除空格的规则
+                        var data2 = data.replace(/\n|\t|\s/g,'');  //去除空格的字符数据 不校验是否合法  监听时返回
+                        if(rule2.length === 0 && data2.length === 0){
+                            alert('规则和返回数据至少设置一个');
+                            return;
+                        }else if(rule2.length !==0 &&data2.length !== 0){  //规则和数据都有值  以数据为准
+                            alert('规则和数据都设置时,将以"数据"为准返回');
+
+                        }else if(data2.length === 0 && rule2.length !==0 ){//规则有   数据没有   以规则为准  要校验规则是否能序列化
+                            alert('单独设置规则时,将以"规则"为准返回随机数据');
+                            var flg = true; //判断规则是否能序列化的标识
+                            try {
+                                var a = JSON.parse(rule2);
+                            } catch (error) {
+                                alert('规则格式错误，请重新输入')    
+                                return;                  
+                            }
+                        }
+                        //提交 
+                        $.ajax({
+                            url:'/mock_admin/update',
+                            type:'post',
+                            dataType:'json',
+                            data:{
+                                [model.mock_id]:id,
+                                [model.mock_rule]:rule2,
+                                [model.mock_data]:data2
+                            },
+                            success:(res)=>{
+                                if(res.res === 0){
+                                    alert(res.msg);
+                                    this.mock_rule.value = '';
+                                    this.mock_data.value = '';
+                                    this.mock_res = null;
+                                    this.initSelect();
+                                }else{
+                                    alert(res.msg);
+                                }
+                            }
+                        })
+                    })
+
+                    //监听生成规则按钮
+                    this.btn_createRuleData.addEventListener('click',()=>{
+                        var ruleStr = this.mock_rule.value;
+                        var ruleStr2 = ruleStr.replace(/\n|\t|\s/g,'');
+                        
+                        try {
+                            var ruleJson = JSON.parse(ruleStr2);
+                            var response_data = Mock.mock(ruleJson);
+                            this.mock_data.value = JSON.stringify(response_data,null,4);
+                        } catch (error) {
+                            alert('请检查规则');
+                        }
+                    })
+                }
+            }
+            controller.init(view);
+        }.call()
+    </script>
+</body>
+</html>

@@ -9,7 +9,7 @@
         *{margin:0;padding:0;}
         .clearfix::after{content:''; display: block; clear:both;}
         #container{ width:100%;}
-        #container .def_mock, #container .user_mock{width:50%; border:1px solid red; box-sizing: border-box;float:left;}
+        #container .user_mock{width:50%; border:1px solid red; box-sizing: border-box;float:left;}
         input,select{line-height: 30px;outline: none;width:300px;font-size:14px;color:#333;margin:10px;}
     </style>
 </head>
@@ -19,15 +19,6 @@
     </header>
     <section id="container" class="container">
         <div class="clearfix">
-            <div id="def_mock" class="def_mock">
-                <p>
-                    <span>默认生成的mock数据</span>
-                    <span>url:  </span>
-                    <button class="btn">刷新</button>
-                </p>
-                <textarea name="rule"  cols="30" rows="10" style="width:35%;height:400px;"></textarea>
-                <textarea name="content" cols="30" rows="10" style="width:60%;height:400px;"></textarea>
-            </div>
             <div class="user_mock">
                 <select name="" id="url_list" style="height:30px;"></select> <button id="search">查询</button><br>
                 <textarea name="" id="data_list" cols="30" rows="10" style="width:60%;height:300px;"></textarea>
@@ -48,7 +39,6 @@
     <footer></footer>
     <script src="js/jquery-3.1.1.js"></script>
     <script src="js/mock.js"></script>
-    <script src="js/def_mock.js"></script>
     <script>
         !function(){
             var $search = $('.user_mock #search');
