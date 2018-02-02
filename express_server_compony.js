@@ -1,5 +1,7 @@
 const express=require('express');
 var fs = require('fs')
+const querystring=require('querystring');
+const urlLib=require('url');
 var bodyParser = require('body-parser');
 var server=express();
 
@@ -35,12 +37,24 @@ db.query(sqlModel.sqlSelect, (err, data)=>{
 
 //只是生成路由  里面的逻辑根据该url对应的规则生成数据
 function firstSetRoute(url){
+    console.log('分配的路由url==>'+url);
     let routeUser = express.Router();
     routeUser.get('/',function(req,res){
+        var routeUrl = url;
+        //解析参数如果带get
+        var obj=urlLib.parse(req.url, true);
+        const parseUrl=obj.pathname;
+        const parseGET=obj.query;
+        const searchGET = obj.search;
+        var newUrl = urlLib.resolve(routeUrl, searchGET);
+        console.log(obj)
+        console.log(parseGET)
+        console.log(newUrl)
         //根据url生成路由    
         console.log('有人来了'+url);
+        console.log('带请求参数'+newUrl)
         // 这个url匹配的数据要自己单独查询
-        db.query(sqlModel.getDataByUrl(url), (err, data)=>{
+        db.query(sqlModel.getDataByUrl(newUrl), (err, data)=>{
             if(err){
                 console.log('该接口查询出错', err);
                 res.send('{"res":"1","msg":"该接口查询失败无法匹配该url"}')

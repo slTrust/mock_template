@@ -118,8 +118,8 @@
                             type:'post',
                             dataType:'json',
                             data:{
-                                mock_url:url2,
-                                mock_name:name2
+                                [model.mock_url]:url2,
+                                [model.mock_name]:name2
                             },
                             success:(res)=>{
                                 if(res.res === 0){
