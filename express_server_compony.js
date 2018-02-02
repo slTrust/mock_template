@@ -26,7 +26,6 @@ db.query(sqlModel.sqlSelect, (err, data)=>{
             var mock_url = data[i][sqlModel.sqlTable_Mock_url];
             var mock_rule = data[i][sqlModel.sqlTable_Mock_rule];
             var mock_data = data[i][sqlModel.sqlTable_Mock_data];
-            //initRoute(mock_url,mock_rule,mock_data)
             firstSetRoute(mock_url)
         }
       
@@ -44,7 +43,7 @@ function firstSetRoute(url){
         db.query(sqlModel.getDataByUrl(url), (err, data)=>{
             if(err){
                 console.log('该接口查询出错', err);
-                res.send('{"res":"1","msg":"该接口查询失败"}')
+                res.send('{"res":"1","msg":"该接口查询失败无法匹配该url"}')
             }else{
                
                 if(data&&data.length!=0){
@@ -58,7 +57,6 @@ function firstSetRoute(url){
                 }
             }
         });
-        
     });
     //把路由加入到express
     server.use(url,routeUser);
